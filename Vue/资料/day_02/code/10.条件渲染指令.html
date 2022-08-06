@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- 希望 Vue 能够控制下面的这个 div，帮我们在把数据填充到 div 内部 -->
+  <div id="app">
+    <!-- v-is和v-show都是条件渲染指令,如果判断为true就显示,false就隐藏,
+        区别是v-if隐藏是动态删除,
+        而v-show是display:none
+    -->
+    <p v-if="flag">这是被v-if控制的元素</p>
+    <p v-show="flag">这是被v-show控制的元素</p>
+    <!-- 如果刚进入页面的时候,某些元素不需要被展示,而且后期这些元素可能不需要被用到 -->
+
+    <!-- v-else-if 必须配套 v-if 使用 -->
+    <hr>
+    <input type="text" v-model="rank">
+    <div v-if="rank === 'A'">优秀</div>
+    <div v-else-if="rank === 'B'">良好</div>
+    <div v-else-if="rank=== 'C'">一般</div>
+    <div v-else>差</div>
+
+  </div>
+
+  <!-- 1. 导入 Vue 的库文件，在 window 全局就有了 Vue 这个构造函数 -->
+  <script src="./lib/vue-2.6.12.js"></script>
+  <!-- 2. 创建 Vue 的实例对象 -->
+  <script>
+    // 创建 Vue 的实例对象
+    const vm = new Vue({
+      // el 属性是固定的写法，表示当前 vm 实例要控制页面上的哪个区域，接收的值是一个选择器
+      el: '#app',
+      // data 对象就是要渲染到页面上的数据
+      data: {
+        rank:'',
+        // 如果flag为true,则展示被控制被控制的元素,false就隐藏
+        flag:true,
+      },
+      methods: {
+        
+      },
+    })
+  </script>
+</body>
+
+</html>

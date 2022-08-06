@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>你好</h1>
+</body>
+<script>
+  let person = {
+    name: 'ls',
+    age:18
+  }
+  const p = new Proxy(person,{
+    // 当有人访问p的属性时,就会触发这个get()函数，target是person对象,propName是访问的属性名
+    get(target,propName) {
+      console.log(`有人读取了p身上的${propName}属性`)
+      return target[propName]
+    },
+    // 当有人修改p的属性时,就会触发这个set()函数，target是person对象,propName是修改的属性名,value是修改后的值
+    set(target,propName,value) {
+      console.log(`有人修改了p身上的${propName}属性,我要去更新页面了`)
+      return target[propName]
+    },
+    // 当有人删除p的属性时,就会触发这个deleteProperty()函数，target是person对象,propName是删除的属性名
+    deleteProperty(target,propName){
+      console.log(`有人删除了p身上的${propName}属性,我要去更新页面了`)
+      return delete target[propName]
+    }
+  })
+</script>
+</html>

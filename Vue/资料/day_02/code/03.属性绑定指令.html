@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 希望vue 能控制下面的div,帮助我们把数据填入div内,双花括号里面填数据 -->
+    <div id="app">
+        <!-- {{}}无法放入属性中 -->
+        <!-- 要将data中的数据放入属性中,必须在这个属性前加v-bind -->
+        <input type="text" v-bind:placeholder="tips">
+        <!-- v-bind:可以简写成: -->
+        <img :src="photo" alt="" style="height: 150px;">
+
+        <hr>
+        <!-- 在{{}}内可以使用js的运算 -->
+        <div>1 + 2 的结果是：{{ 1 + 2 }}</div>
+        <div>{{ tips }} 反转的结果是：{{ tips.split('').reverse().join('') }}</div>
+        <div :title="'box-'+index">这是一个div</div>
+
+    </div>
+
+    <!-- 1.导入vue 的库文件 -->
+    <script src="./lib/vue-2.6.12.js"></script>
+    <!-- 2.创建一个Vue的实例对象 -->
+    <script>
+    //创建Vue的实例对象
+    const vm = new Vue({
+        //el 属性时固定的写法,告诉vue要控制页面上的哪个区域,接受的是一个选择器
+        el:'#app',
+        //data 对象就是要渲染页面上的数据
+        data: {
+            tips:'请输入用户名',
+            photo:'https://tse3-mm.cn.bing.net/th/id/OIP-C.7r3dWJzc3SoPDaWaTIyAnwHaE8?w=270&h=180&c=7&r=0&o=5&dpr=1.5&pid=1.7',
+            index:3,
+        }
+    })
+
+    </script>
+</body>
+</html>

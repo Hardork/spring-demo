@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 希望vue 能控制下面的div,帮助我们把数据填入div内,双花括号里面填数据 -->
+    <div id="app">
+        <!-- {{ username }} -->
+        <!-- 把 username 对应的值,渲染到第一个p标签中,会覆盖原本的p标签内容 -->
+        <p v-text="username"></p>
+        <p v-text="gender"></p>
+        <!-- 插值表达式,用的最多，内容的占位符不会影响原有的内容 -->
+        <p>性别:{{ gender | capi}}</p>
+        <!-- 将标签渲染到页面上 -->
+        <div v-html="info"></div>
+
+    </div>
+
+    <!-- 1.导入vue 的库文件 -->
+    <script src="./lib/vue-2.6.12.js"></script>
+    <!-- 2.创建一个Vue的实例对象 -->
+    <script>
+    //创建Vue的实例对象
+    const vm = new Vue({
+        //el 属性时固定的写法,告诉vue要控制页面上的哪个区域,接受的是一个选择器
+        el:'#app',
+
+        //data 对象就是要渲染页面上的数据
+        data: {
+            username:'zs',
+            gender:"female",
+            info:'<h4 style="color:red; font-weight: bold">欢迎学习Vue.js</h4>'
+        },
+        // 过滤器本质是函数
+        filters: {
+            // 过滤器中的val是竖线前的值
+            capi(val) {
+                // 强调:过滤器中一定要有个返回值
+                const first =  val.charAt(0).toUpperCase()
+                const other = val.slice(1)
+
+                return first+other
+
+            }
+        }
+    })
+
+    </script>
+</body>
+</html>

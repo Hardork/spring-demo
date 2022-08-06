@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 希望vue 能控制下面的div,帮助我们把数据填入div内,双花括号里面填数据 -->
+    <div id="app">
+        <p>count的值是:{{ count }}</p>
+        <!-- v-on:是绑定事件 -->
+        <!-- v-on:指令可以简写成 @ -->
+        <button @click="addCount(2)">+2</button>
+        <button @click="deCount()">-1</button>
+    </div>
+
+    <!-- 1.导入vue 的库文件 -->
+    <script src="./lib/vue-2.6.12.js"></script>
+    <!-- 2.创建一个Vue的实例对象 -->
+    <script>
+    //创建Vue的实例对象
+    const vm = new Vue({
+        //el 属性时固定的写法,告诉vue要控制页面上的哪个区域,接受的是一个选择器
+        el:'#app',
+        //data 对象就是要渲染页面上的数据
+        data: {
+            count:0,
+        },
+        // methods就是定义事件的处理函数
+        methods:{
+            // addCount:function(){
+            //     count+=1;
+            // }
+            // 也可以这样写
+            addCount(n){
+                // vm是个对象,里面包含了count这个属性
+                // vm.count += 1
+                // 在methods里的 this 就是 vm 这个对象
+                this.count += n
+                console.log(vm);
+            },
+            deCount(){
+                this.count -= 1
+            }
+
+        }
+    })
+
+    </script>
+</body>
+</html>
