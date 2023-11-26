@@ -7,11 +7,11 @@ import java.lang.annotation.Target;
 
 /**
  * @Author:HWQ
- * @DateTime:2023/11/26 16:20
+ * @DateTime:2023/11/26 21:21
  * @Description:
  **/
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-public @interface Component {
+@Target(ElementType.FIELD)
+public @interface Autowired {
     String value() default "";
 }

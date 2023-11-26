@@ -1,7 +1,10 @@
 package com.hwq.spring;
 
 
+import java.beans.Introspector;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +19,7 @@ public class HwqApplicationContext {
 
     // container use for storing bean
     private ConcurrentHashMap<String, BeanDefinition> beanDefinitionConcurrentHashMap = new ConcurrentHashMap<>();
-
+    private ConcurrentHashMap<String, Object> singletonObject = new ConcurrentHashMap<>();
     public HwqApplicationContext(Class appConfigClass) {
         this.configClass = appConfigClass;
 
@@ -35,12 +38,11 @@ public class HwqApplicationContext {
             System.out.println(file);
             if (file.isDirectory()) {
                 File[] files = file.listFiles();
+                System.out.println("ComponentScan files:");
                 for (File f : files) {
                     // get all files in ComponentScan
                     String fileName = f.getAbsolutePath();
-                    System.out.println("ComponentScan files:");
                     System.out.println(fileName);
-
                     if (fileName.endsWith(".class")) {
                         // 获取class类的相对路径
                         String className = fileName.substring(fileName.indexOf("com"), fileName.indexOf(".class"));
@@ -51,7 +53,13 @@ public class HwqApplicationContext {
 
                             if (clazz.isAnnotationPresent(Component.class)) { // having Component annotation
                                 // get beanName
-                                String beanName = clazz.getAnnotation(Component.class).value();
+                                Component component = clazz.getAnnotation(Component.class);
+                                String beanName = component.value();
+
+                                if (beanName.equals("")) {
+                                    // Component没有指定beanName的时候，自动分配一个beanName 例如：UserService -> userService
+                                    beanName = Introspector.decapitalize(clazz.getSimpleName());
+                                }
 
                                 // BeanDefinition
                                 BeanDefinition beanDefinition = new BeanDefinition();
@@ -72,14 +80,76 @@ public class HwqApplicationContext {
 
                     }
 
-
                 }
             }
+        }
 
+        // 初始化bean对象
+        for (String beanName : beanDefinitionConcurrentHashMap.keySet()) {
+            BeanDefinition beanDefinition = beanDefinitionConcurrentHashMap.get(beanName);
+
+            if (beanDefinition.getScope().equals("singleton")) {
+                Object bean = createBean(beanDefinition, beanName);
+                singletonObject.put(beanName, bean);
+            }
         }
     }
 
+    private Object createBean(BeanDefinition beanDefinition, String beanName) {
+        Class type = beanDefinition.getType();
+        try {
+            Object instance = type.getConstructor().newInstance();
+
+            // 注入依赖
+            Field[] declaredFields = type.getDeclaredFields();
+            for (Field field : declaredFields) {
+                if (field.isAnnotationPresent(Autowired.class)) {
+                    // 依赖名
+                    String name = field.getName();
+                    field.setAccessible(true);
+                    field.set(instance, getBean(name));
+                }
+            }
+
+            if (instance instanceof BeanNameAware) {
+                ((BeanNameAware) instance).setBeanName(beanName);
+            }
+
+
+            return instance;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 获取bean对象
+     * @param name
+     * @return
+     */
     public Object getBean(String name) {
-        return new Object();
+        BeanDefinition beanDefinition = beanDefinitionConcurrentHashMap.get(name);
+        if (beanDefinition == null) {
+            throw new NullPointerException();
+        } else {
+            String scope = beanDefinition.getScope();
+            if (scope.equals("singleton")) {
+                Object bean = singletonObject.get(name);
+                if (bean == null) {
+                    Object o = createBean(beanDefinition, name);
+                    singletonObject.put(name, o);
+                }
+                return beanDefinition;
+            } else {
+                return createBean(beanDefinition, name);
+            }
+        }
     }
 }
