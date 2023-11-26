@@ -6,6 +6,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,6 +21,7 @@ public class HwqApplicationContext {
     // container use for storing bean
     private ConcurrentHashMap<String, BeanDefinition> beanDefinitionConcurrentHashMap = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, Object> singletonObject = new ConcurrentHashMap<>();
+    private ArrayList<BeanPostProcessor> beanPostProcessorList = new ArrayList<>();
     public HwqApplicationContext(Class appConfigClass) {
         this.configClass = appConfigClass;
 
@@ -49,7 +51,13 @@ public class HwqApplicationContext {
                         className = className.replace('\\', '.');
 
                         try { // create bean
+
                             Class<?> clazz = classLoader.loadClass(className);
+
+                            if (BeanPostProcessor.class.isAssignableFrom(clazz)) {
+                                BeanPostProcessor instance = (BeanPostProcessor) clazz.newInstance();
+                                beanPostProcessorList.add(instance);
+                            }
 
                             if (clazz.isAnnotationPresent(Component.class)) { // having Component annotation
                                 // get beanName
@@ -75,6 +83,10 @@ public class HwqApplicationContext {
                                 beanDefinitionConcurrentHashMap.put(beanName, beanDefinition);
                             }
                         } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (InstantiationException e) {
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
 
@@ -111,10 +123,19 @@ public class HwqApplicationContext {
                 }
             }
 
+            // 用户自定义beanName
             if (instance instanceof BeanNameAware) {
                 ((BeanNameAware) instance).setBeanName(beanName);
             }
 
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessorList) {
+                beanPostProcessor.beforeProcessBeforeInitialization();
+            }
+
+            // 用户自定义初始化
+            if (instance instanceof InitializingBean) {
+                ((InitializingBean)instance).afterPropertySet();
+            }
 
             return instance;
         } catch (InstantiationException e) {
