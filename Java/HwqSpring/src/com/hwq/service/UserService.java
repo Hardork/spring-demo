@@ -8,8 +8,8 @@ import com.hwq.spring.*;
  * @Description:
  **/
 @Component("userService")
-@Scope("prototype")
-public class UserService implements BeanNameAware, InitializingBean {
+@Scope("")
+public class UserService implements BeanNameAware, InitializingBean, UserInterface {
 //    @Autowired
 //    private OrderService orderService;
 
@@ -23,5 +23,10 @@ public class UserService implements BeanNameAware, InitializingBean {
     @Override
     public void afterPropertySet() {
 
+    }
+
+    @Override
+    public void test() {
+        System.out.println("test");
     }
 }

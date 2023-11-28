@@ -6,7 +6,7 @@ package com.hwq.spring;
  * @Description:
  **/
 public interface BeanPostProcessor {
-    void postProcessBeforeInitialization();
+    Object postProcessBeforeInitialization(String beanName, Object instance);
 
-    void beforeProcessBeforeInitialization();
+    Object beforeProcessBeforeInitialization(String beanName, Object instance);
 }

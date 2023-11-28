@@ -54,12 +54,15 @@ public class HwqApplicationContext {
 
                             Class<?> clazz = classLoader.loadClass(className);
 
-                            if (BeanPostProcessor.class.isAssignableFrom(clazz)) {
-                                BeanPostProcessor instance = (BeanPostProcessor) clazz.newInstance();
-                                beanPostProcessorList.add(instance);
-                            }
+
 
                             if (clazz.isAnnotationPresent(Component.class)) { // having Component annotation
+
+                                if (BeanPostProcessor.class.isAssignableFrom(clazz)) { // 添加代理对象
+                                    BeanPostProcessor instance = (BeanPostProcessor) clazz.newInstance();
+                                    beanPostProcessorList.add(instance);
+                                }
+
                                 // get beanName
                                 Component component = clazz.getAnnotation(Component.class);
                                 String beanName = component.value();
@@ -129,12 +132,16 @@ public class HwqApplicationContext {
             }
 
             for (BeanPostProcessor beanPostProcessor : beanPostProcessorList) {
-                beanPostProcessor.beforeProcessBeforeInitialization();
+                instance = beanPostProcessor.beforeProcessBeforeInitialization(beanName, instance);
             }
 
             // 用户自定义初始化
             if (instance instanceof InitializingBean) {
                 ((InitializingBean)instance).afterPropertySet();
+            }
+
+            for (BeanPostProcessor beanPostProcessor : beanPostProcessorList) {
+                instance = beanPostProcessor.postProcessBeforeInitialization(beanName, instance);
             }
 
             return instance;
@@ -164,10 +171,10 @@ public class HwqApplicationContext {
             if (scope.equals("singleton")) {
                 Object bean = singletonObject.get(name);
                 if (bean == null) {
-                    Object o = createBean(beanDefinition, name);
-                    singletonObject.put(name, o);
+                    bean = createBean(beanDefinition, name);
+                    singletonObject.put(name, bean);
                 }
-                return beanDefinition;
+                return bean;
             } else {
                 return createBean(beanDefinition, name);
             }

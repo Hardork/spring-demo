@@ -10,6 +10,7 @@ import com.hwq.spring.HwqApplicationContext;
 public class Test {
     public static void main(String[] args) {
         HwqApplicationContext hwqApplicationContext = new HwqApplicationContext(AppConfig.class);
-        UserService userService = (UserService) hwqApplicationContext.getBean("userService");
+        UserInterface userService = (UserInterface) hwqApplicationContext.getBean("userService");
+        userService.test();
     }
 }
